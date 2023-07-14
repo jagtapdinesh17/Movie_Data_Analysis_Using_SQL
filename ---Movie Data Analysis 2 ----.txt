@@ -1,0 +1,107 @@
+---Movie Data Analysis 2 ----
+
+1. From the following table, write a SQL query to find the actors who played a role in the movie 'Annie Hall'. Return all the fields of actor table.
+
+Query - 
+
+SELECT * FROM actor
+WHERE act_id IN 
+(SELECT act_id FROM movie_cast
+WHERE mov_id IN
+(SELECT mov_id FROM movie
+WHERE mov_title = 'Annie Hall')
+);
+
+2. From the following tables, write a SQL query to find the director of a film that cast a role in 'Eyes Wide Shut'. Return director first name, last name.
+
+Query - 
+
+SELECT dir_fname AS "Dir. First_name",
+dir_lname AS "Last Name" 
+FROM director
+WHERE dir_id IN
+(SELECT dir_id FROM movie_direction
+WHERE mov_id IN
+(SELECT mov_id FROM movie
+WHERE mov_title = 'Eyes Wide Shut')
+);
+
+3. From the following table, write a SQL query to find those movies that have been released in countries other than the United Kingdom. Return movie title, movie year, movie time, and date of release, releasing country.
+
+Query - 
+
+SELECT mov_title, mov_year, mov_time, mov_dt_rel, mov_rel_country 
+FROM movie
+WHERE mov_rel_country != 'UK';
+
+5. From the following tables, write a SQL query to find those movies directed by the director whose first name is Woody and last name is Allen. Return movie title.
+
+Query - 
+SELECT mov_title FROM movie
+WHERE mov_id IN
+(SELECT mov_id FROM movie_direction
+WHERE dir_id IN
+(SELECT dir_id FROM director 
+WHERE dir_fname = 'Woody' AND dir_lname = 'Allen')
+)
+
+6. From the following tables, write a SQL query to determine those years in which there was at least one movie that received a rating of at least three stars. Sort the result-set in ascending order by movie year. Return movie year.
+
+Query - SELECT DISTINCT mov_year FROM movie
+WHERE mov_id IN
+(SELECT mov_id FROM rating
+WHERE rev_stars >=3)
+ORDER BY mov_year;
+
+7. From the following table, write a SQL query to search for movies that do not have any ratings. Return movie title.
+
+Query - 
+SELECT mov_title 
+FROM movie
+WHERE mov_id 
+NOT IN (SELECT mov_id FROM rating)
+
+8. From the following table, write a SQL query to find those reviewers who have not given a rating to certain films. Return reviewer name.
+
+Query- 
+
+SELECT rev_name 
+FROM reviewer
+WHERE rev_id IN 
+(SELECT rev_id FROM rating
+WHERE rev_stars IS NULL);
+
+9. From the following tables, write a SQL query to find movies that have been reviewed by a reviewer and received a rating. Sort the result-set in ascending order by reviewer name, movie title, review Stars. Return reviewer name, movie title, review Stars.
+
+Query - 
+
+SELECT rev_name, mov_title, rev_stars
+FROM reviewer a, movie b, rating c
+WHERE
+a.rev_id = c.rev_id
+AND
+c.mov_id = b.mov_id
+AND
+c.rev_stars IS NOT NULL
+AND
+a.rev_name IS NOT NULL 
+ORDER BY rev_name, mov_title, rev_stars;
+
+10. From the following table, write a SQL query to find movies that have been reviewed by a reviewer and received a rating. Group the result set on reviewer’s name, movie title. Return reviewer’s name, movie title.
+
+Query - 
+
+SELECT rev_name,mov_title 
+FROM reviewer, rating, movie
+WHERE 
+reviewer.rev_id = rating.rev_id
+AND
+rating.mov_id = movie.mov_id
+AND
+rating.rev_id IN
+(
+SELECT rev_id FROM rating
+GROUP BY rev_id
+HAVING COUNT(mov_id) > 1
+);
+
