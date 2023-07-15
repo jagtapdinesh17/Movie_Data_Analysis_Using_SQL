@@ -1,0 +1,121 @@
+---Movie Data Analysis 3 ----
+
+1. From the following table, write a SQL query to find all reviewers whose ratings contain a NULL value. Return reviewer name.
+
+Query - 
+
+SELECT rev_name FROM reviewer
+WHERE rev_id IN
+(SELECT rev_id FROM rating
+WHERE rev_stars IS NULL);
+
+Query 2- 
+SELECT rev_name FROM reviewer a
+JOIN rating b
+ON a.rev_id = b.rev_id 
+WHERE b.rev_stars IS NULL;
+
+2. From the following table, write a SQL query to find out who was cast in the movie 'Annie Hall'. Return actor first name, last name and role.
+
+Query - SELECT a.act_fname, a.act_lname, c.role
+FROM actor a JOIN movie_cast c
+ON a.act_id = c.act_id
+JOIN
+movie m 
+ON c.mov_id = m.mov_id
+WHERE m.mov_title = 'Annie Hall';
+
+3. From the following table, write a SQL query to find the director who directed a movie that featured a role in 'Eyes Wide Shut'. Return director first name, last name and movie title.
+
+Query- 
+
+SELECT d.dir_fname, d.dir_lname, m.mov_title 
+FROM 
+movie m JOIN movie_cast mc
+ON m.mov_id = mc.mov_id
+JOIN movie_direction md
+ON md.mov_id = mc.mov_id
+JOIN director d
+ON md.dir_id = d.dir_id
+WHERE m.mov_title =  'Eyes Wide Shut';
+
+4. From the following tables, write a SQL query to find the director of a movie that cast a role as Sean Maguire. Return director first name, last name and movie title.
+
+Query - 
+
+SELECT d.dir_fname, d.dir_lname, m.mov_title
+FROM movie m JOIN movie_cast mc
+ON m.mov_id = mc.mov_id
+JOIN movie_direction md
+ON mc.mov_id = md.mov_id
+JOIN director d
+ON md.dir_id = d.dir_id
+WHERE mc.role = 'Sean Maguire';
+
+5. From the following table, write a SQL query to find out which actors have not appeared in any movies between 1990 and 2000 (Begin and end values are included.). Return actor first name, last name, movie title and release year.
+
+Query - 
+
+SELECT a.act_fname, a.act_lname, m.mov_title, m.mov_year
+FROM movie m JOIN movie_cast mc
+ON m.mov_id = mc.mov_id
+JOIN actor a
+ON a.act_id = mc.act_id
+WHERE m.mov_year NOT BETWEEN 1990 AND 2000;
+
+6. From the following table, write a SQL query to find the directors who have directed films in a variety of genres. Group the result set on director first name, last name and generic title. Sort the result-set in ascending order by director first name and last name. Return director first name, last name and number of genres movies.
+
+Query - 
+
+SELECT  
+d.dir_fname, d.dir_lname, g.gen_title, COUNT(g.gen_id) AS num FROM director d
+JOIN movie_direction md
+ON d.dir_id = md.dir_id
+JOIN movie_genres mg 
+ON mg.mov_id = md.mov_id
+JOIN genres g
+ON mg.gen_id = g.gen_id
+GROUP BY d.dir_fname, d.dir_lname, g.gen_title
+ORDER BY d.dir_fname, d.dir_lname, num;
+
+7. From the following tables, write a SQL query to find the movies with year and genres. Return movie title, movie year and generic title.
+
+Query - 
+
+ SELECT mov_title, mov_year, gen_title 
+FROM movie
+NATURAL JOIN movie_genres
+NATURAL JOIN genres;
+
+8. From the following tables, write a SQL query to find all the movies with year, genres, and name of the director.
+
+Query - 
+
+SELECT mov_title, mov_year, dir_fname || ' ' || dir_lname AS "Director Name" FROM movie
+NATURAL JOIN movie_genres
+NATURAL JOIN genres
+NATURAL JOIN movie_direction
+NATURAL JOIN director;
+
+9. From the following tables, write a SQL query to find the movies released before 1st January 1989. Sort the result-set in descending order by date of release. Return movie title, release year, date of release, duration, and first and last name of the director.
+
+Query - 
+
+SELECT m.mov_title, d.dir_fname, d.dir_lname
+FROM movie m JOIN movie_direction md
+ON m.mov_id = md.mov_id
+JOIN director d 
+ON md.dir_id = d.dir_id
+WHERE m.mov_dt_rel < '1989-01-01'
+ORDER BY m.mov_dt_rel DESC;
+
+10. From the following table, write a SQL query to calculate the average movie length and count the number of movies in each genre. Return genre title, average time and number of movies for each genre.
+
+Query - 
+
+SELECT g.gen_title, AVG(m.mov_time), COUNT(g.gen_title) FROM genres g JOIN
+movie_genres mg
+ON g.gen_id = mg.gen_id
+JOIN movie m
+ON mg.mov_id = m.mov_id
+GROUP BY gen_title;
